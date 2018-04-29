@@ -5,8 +5,11 @@
 #include <unistd.h>
 #include "zmq.h"
 
+sig_atomic_t flag = 0;
+
 void handler(int arg) {
     std::cout << "Term signal received. Value is: " << arg << std::endl;
+    flag = 1;
 }
 
 int main() {
@@ -26,6 +29,10 @@ int main() {
         char buffer[100];
         zmq_recv(reply, buffer, 100, 0);
         buffer[99] = 0;
+        if(flag == 1) {
+            return 0;
+        }
+
         std::cout << "received " << buffer << std::endl;
 
         if(!strcmp(buffer, "stop"))
